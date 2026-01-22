@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>祝福语</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            position: relative;
+            overflow: hidden;
+            padding: 20px;
+            transition: background-color 1s ease;
+        }
+        
+        /* 背景根据祝福类型变化 */
+        body.bg-birthday {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+        }
+        
+        body.bg-festival {
+            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+        }
+        
+        body.bg-wedding {
+            background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+        }
+        
+        body.bg-graduation {
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+        }
+        
+        body.bg-friendship {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+        }
+        
+        body.bg-health {
+            background: linear-gradient(135deg, #a3bded 0%, #6991c7 100%);
+        }
+        
+        body.bg-success {
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+        }
+        
+        body.bg-general {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+        
+        /* 装饰元素 */
+        .decoration {
+            position: absolute;
+            font-size: 2.5rem;
+            opacity: 0.15;
+            z-index: -1;
+            animation: float 20s infinite linear;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+            100% { transform: translateY(0) rotate(360deg); }
+        }
+        
+        /* 主要祝福内容 */
+        .blessing-text {
+            font-size: 2.8rem;
+            line-height: 1.5;
+            font-weight: 500;
+            color: #2c3e50;
+            text-align: center;
+            padding: 40px;
+            background-color: rgba(255, 255, 255, 0.85);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            max-width: 900px;
+            cursor: pointer;
+            transition: all 0.5s ease;
+            position: relative;
+            user-select: none;
+        }
+        
+        .blessing-text:hover {
+            transform: scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .blessing-text:active {
+            transform: scale(0.98);
+            transition: transform 0.1s ease;
+        }
+        
+        /* 点击提示 */
+        .click-hint {
+            position: absolute;
+            bottom: -30px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 0.9rem;
+            color: rgba(52, 152, 219, 0.8);
+            opacity: 0.7;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+        
+        /* 右上角帮助图标 */
+        .help-icon {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+        
+        .help-icon:hover {
+            background-color: white;
+            transform: scale(1.1);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .help-icon i {
+            font-size: 1.2rem;
+            color: #3498db;
+        }
+        
+        /* 使用说明弹窗 */
+        .help-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .help-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+        
+        .help-modal.active .modal-content {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .modal-header h2 {
+            color: #2c3e50;
+            font-size: 1.5rem;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #7f8c8d;
+            transition: color 0.3s ease;
+        }
+        
+        .close-btn:hover {
+            color: #e74c3c;
+        }
+        
+        .modal-body {
+            line-height: 1.6;
+            color: #555;
+        }
+        
+        .modal-body p {
+            margin-bottom: 15px;
+        }
+        
+        .modal-body code {
+            background-color: #f8f9fa;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            color: #e74c3c;
+            font-size: 0.9rem;
+        }
+        
+        .example-list {
+            margin-top: 20px;
+            padding-left: 20px;
+        }
+        
+        .example-list li {
+            margin-bottom: 10px;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .blessing-text {
+                font-size: 2.2rem;
+                padding: 30px 20px;
+            }
+            
+            .click-hint {
+                font-size: 0.8rem;
+                bottom: -25px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .blessing-text {
+                font-size: 1.8rem;
+                padding: 25px 15px;
+            }
+            
+            .decoration {
+                font-size: 2rem;
+            }
+            
+            .modal-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-general">
+    <!-- 装饰元素 -->
+    <div class="decoration" style="top: 10%; left: 5%;">✨</div>
+    <div class="decoration" style="top: 20%; right: 8%; animation-delay: 2s">❤️</div>
+    <div class="decoration" style="bottom: 15%; left: 7%; animation-delay: 4s">🌸</div>
+    <div class="decoration" style="bottom: 25%; right: 10%; animation-delay: 6s">🎉</div>
+    <div class="decoration" style="top: 40%; left: 12%; animation-delay: 8s">🌟</div>
+    
+    <!-- 祝福语文本 -->
+    <div class="blessing-text" id="blessing-text">
+        愿你的每一天都充满阳光和欢笑
+        <div class="click-hint">点击切换祝福语</div>
+    </div>
+    
+    <!-- 右上角帮助图标 -->
+    <div class="help-icon" id="help-icon">
+        <i class="fas fa-question"></i>
+    </div>
+    
+    <!-- 使用说明弹窗 -->
+    <div class="help-modal" id="help-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>使用说明</h2>
+                <button class="close-btn" id="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>这是一个简洁的祝福语页面，支持通过URL参数指定祝福类型。</p>
+                
+                <h3>基本操作：</h3>
+                <p>• <strong>点击祝福语</strong>：切换同类型的另一句祝福语</p>
+                <p>• <strong>按空格键</strong>：也可以切换祝福语</p>
+                
+                <h3>URL参数使用：</h3>
+                <p>在URL后添加 <code>?type=类别</code> 可指定祝福类型</p>
+                
+                <h3>支持的类型：</h3>
+                <ul class="example-list">
+                    <li><code>?type=birthday</code> - 生日祝福</li>
+                    <li><code>?type=festival</code> - 节日祝福</li>
+                    <li><code>?type=wedding</code> - 婚礼祝福</li>
+                    <li><code>?type=graduation</code> - 毕业祝福</li>
+                    <li><code>?type=friendship</code> - 友情祝福</li>
+                    <li><code>?type=health</code> - 健康祝福</li>
+                    <li><code>?type=success</code> - 成功祝福</li>
+                    <li><code>?type=general</code> - 通用祝福（默认）</li>
+                </ul>
+                
+                <h3>示例：</h3>
+                <p><code>https://your-username.github.io/?type=birthday</code></p>
+                <p><code>https://your-username.github.io/?type=graduation</code></p>
+                
+                <p style="margin-top: 20px; color: #3498db; font-weight: 500;">✨ 愿你在此收获温暖与祝福 ✨</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 祝福语数据库
+        const blessings = {
+            birthday: [
+                "生日快乐！愿你的新一岁充满惊喜与美好，每一天都闪闪发光。",
+                "祝你生日快乐，岁岁平安，年年有今日，岁岁有今朝！",
+                "愿时光能缓，故人不散，愿你笑靥如花，一生被爱。生日快乐！",
+                "生日快乐！愿你遍历山河，觉得人间值得，未来可期。",
+                "祝你生日快乐，愿所有的美好都如期而至，所有的幸运都不期而遇。",
+                "愿你的生日充满无穷的快乐，愿你今天的回忆温馨，愿你所有的梦想甜美！",
+                "生日快乐！愿你的生活像蛋糕一样甜蜜，像蜡烛一样明亮。",
+                "祝你生日快乐，健康平安，万事如意，心想事成！"
+            ],
+            festival: [
+                "新年快乐！愿你新的一年里，所有的希望都能如愿，所有的梦想都能实现。",
+                "中秋佳节，月圆人团圆，祝你阖家幸福，万事如意！",
+                "端午节安康，愿你和家人幸福安康，生活甜蜜如粽！",
+                "圣诞快乐！愿平安喜乐常伴你左右，幸福美满永随你心。",
+                "国庆佳节，祝福祖国繁荣昌盛，也祝你假期愉快，心情美丽！",
+                "元宵节快乐，愿你生活团团圆圆，事业圆圆满满！",
+                "情人节快乐，愿有情人终成眷属，爱情甜蜜美满！",
+                "劳动节快乐，感谢你的辛勤付出，愿你收获满满的幸福与成就！"
+            ],
+            wedding: [
+                "祝你们永结同心，百年好合，新婚愉快，甜甜蜜蜜！",
+                "愿你们相爱年年岁岁，相知岁岁年年，白首偕老，永浴爱河。",
+                "祝新人新婚快乐，早生贵子，幸福美满，天长地久！",
+                "愿你们的爱情如美酒，越陈越香，婚姻如诗歌，韵味悠长。",
+                "祝你们携手共度人生风雨，共享世间美好，恩爱一生。",
+                "愿你们的家园如同伊甸园般美好，生活如同天堂般幸福！",
+                "祝福新人情比金坚，爱比海深，新婚快乐，永结同心！",
+                "愿你们用爱去缠绕对方，彼此互相体谅和关怀，共同分享今后的苦与乐。"
+            ],
+            graduation: [
+                "毕业快乐！愿你前程似锦，一路繁花，未来可期！",
+                "恭喜毕业！愿你在人生的新阶段里，勇敢追梦，不负韶华。",
+                "毕业不是结束，而是新的开始。祝你展翅高飞，实现梦想！",
+                "愿你以梦为马，不负韶华，毕业快乐，未来可期！",
+                "祝贺你顺利完成学业，愿你未来的道路越走越宽广，越走越辉煌！",
+                "毕业快乐！愿你保持热爱，奔赴山海，高处相见。",
+                "愿你带着母校的祝福，扬帆起航，驶向更广阔的海洋！",
+                "毕业是新征程的起点，愿你披荆斩棘，勇往直前，创造辉煌！"
+            ],
+            friendship: [
+                "真正的朋友，是人生最珍贵的财富。感谢一路有你，愿友谊长存！",
+                "朋友是人生路上的灯，感谢你一直照亮我前行的路。",
+                "愿我们的友谊如酒，越陈越香；如茶，越品越醇。",
+                "感谢你在我需要的时候出现，愿我们的友谊地久天长。",
+                "朋友是另一个自己，感谢你懂我的喜怒哀乐，陪我走过春夏秋冬。",
+                "真正的友谊，不会被时间冲淡，不会被距离阻隔。愿我们永远是好兄弟/好姐妹！",
+                "感谢你一直以来的陪伴与支持，愿我们的友谊之树常青。",
+                "朋友是生命中最美的相遇，愿我们的情谊永远温暖如初。"
+            ],
+            health: [
+                "祝你身体健康，精神愉快，活力满满每一天！",
+                "愿你和家人身体健康，平安顺遂，无病无灾。",
+                "健康是最大的财富，愿你珍惜身体，保持活力，享受美好生活。",
+                "祝你早日康复，重获健康，精神焕发，活力四射！",
+                "愿你吃得好，睡得香，身体棒，心情美，健康常伴左右！",
+                "健康是幸福的基石，愿你拥有强健的体魄，享受人生的每一个美好瞬间。",
+                "祝您身体健康，寿比南山，福如东海，笑口常开！",
+                "愿你养成良好生活习惯，保持健康体魄，享受精彩人生。"
+            ],
+            success: [
+                "祝你事业有成，前程似锦，每一步都走得坚定而有力。",
+                "愿你的努力不被辜负，付出终有回报，成功如期而至。",
+                "恭喜你取得优异成绩！愿你再接再厉，更创辉煌！",
+                "祝你项目顺利，工作顺心，早日实现心中的梦想。",
+                "愿你的才华得到充分发挥，成就非凡事业，创造美好未来。",
+                "祝你步步高升，事业腾飞，实现人生的每一个目标！",
+                "愿你的辛勤耕耘换来丰硕成果，付出皆有回报！",
+                "祝你旗开得胜，马到成功，开创属于自己的辉煌！"
+            ],
+            general: [
+                "愿你心中有爱，眼中有光，活成自己想要的模样。",
+                "祝你前程似锦，未来可期，每一步都走得坚定而有力。",
+                "愿你的生活充满阳光，每一天都笑得灿烂如花。",
+                "祝你心想事成，梦想成真，所有的努力都不被辜负。",
+                "愿岁月温柔待你，时光沉淀美好，人生处处是风景。",
+                "祝你健康平安，快乐常伴，幸福永远围绕在身边。",
+                "愿你的每一个选择都引领你走向更美好的明天。",
+                "祝你生活如意，工作顺心，家庭美满，万事亨通。"
+            ]
+        };
+
+        // 祝福类别中文名称映射（用于标题）
+        const categoryNames = {
+            birthday: "生日祝福",
+            festival: "节日祝福",
+            wedding: "婚礼祝福",
+            graduation: "毕业祝福",
+            friendship: "友情祝福",
+            health: "健康祝福",
+            success: "成功祝福",
+            general: "通用祝福"
+        };
+
+        // 获取URL参数
+        function getUrlParameter(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // 获取当前祝福类型
+        function getCurrentCategory() {
+            const type = getUrlParameter('type');
+            // 检查类型是否有效
+            if (type && blessings[type]) {
+                return type;
+            }
+            return 'general'; // 默认返回通用祝福
+        }
+
+        // 获取随机祝福语
+        function getRandomBlessing(category) {
+            const categoryBlessings = blessings[category];
+            const randomIndex = Math.floor(Math.random() * categoryBlessings.length);
+            return categoryBlessings[randomIndex];
+        }
+
+        // 更新页面内容
+        function updatePage() {
+            const category = getCurrentCategory();
+            const blessing = getRandomBlessing(category);
+            
+            // 更新祝福语
+            document.getElementById('blessing-text').innerHTML = 
+                `${blessing}<div class="click-hint">点击切换祝福语</div>`;
+            
+            // 更新背景
+            document.body.className = `bg-${category}`;
+            
+            // 更新页面标题
+            document.title = `${categoryNames[category]}`;
+        }
+
+        // 切换祝福语（带动画效果）
+        function switchBlessing() {
+            const blessingText = document.getElementById('blessing-text');
+            
+            // 添加淡出效果
+            blessingText.style.opacity = '0.5';
+            blessingText.style.transform = 'scale(0.95)';
+            
+            setTimeout(() => {
+                updatePage();
+                blessingText.style.opacity = '1';
+                blessingText.style.transform = 'scale(1)';
+            }, 300);
+        }
+
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始加载祝福语
+            updatePage();
+            
+            // 为祝福语文本添加点击事件
+            document.getElementById('blessing-text').addEventListener('click', switchBlessing);
+            
+            // 为帮助图标添加点击事件
+            document.getElementById('help-icon').addEventListener('click', function() {
+                document.getElementById('help-modal').classList.add('active');
+            });
+            
+            // 为关闭按钮添加点击事件
+            document.getElementById('close-btn').addEventListener('click', function() {
+                document.getElementById('help-modal').classList.remove('active');
+            });
+            
+            // 点击弹窗外部关闭弹窗
+            document.getElementById('help-modal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
+            
+            // 添加键盘快捷键支持（按空格键切换祝福语）
+            document.addEventListener('keydown', function(event) {
+                if (event.code === 'Space') {
+                    event.preventDefault();
+                    switchBlessing();
+                }
+                
+                // 按ESC键关闭帮助弹窗
+                if (event.code === 'Escape') {
+                    document.getElementById('help-modal').classList.remove('active');
+                }
+            });
+        });
+
+        // 监听URL变化（当用户手动修改URL时）
+        window.addEventListener('popstate', function() {
+            updatePage();
+        });
+    </script>
+</body>
+</html>
